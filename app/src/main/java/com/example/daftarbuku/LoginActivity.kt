@@ -58,8 +58,8 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             } else {
-                if (viewModel.loginStatus.value != null) {
-                    Toast.makeText(this, "Login Gagal. Cek kembali Email dan Password", Toast.LENGTH_SHORT).show()
+                if (binding.etUsername.text.isNotEmpty()) {
+                    Toast.makeText(this, "Login Gagal. Email/Username atau Password salah", Toast.LENGTH_SHORT).show()
                 }
             }
         }

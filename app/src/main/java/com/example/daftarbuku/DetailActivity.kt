@@ -5,8 +5,10 @@ import android.app.Dialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -38,7 +40,7 @@ class DetailActivity : AppCompatActivity() {
 
     companion object {
         private const val CHANNEL_ID = "cart_notification_channel"
-        private const val NOTIFICATION_ID = 1001
+        private var notificationIdCounter = 1001
     }
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -84,7 +86,7 @@ class DetailActivity : AppCompatActivity() {
         binding.btnCart.setOnClickListener {
             currentProduct?.let {
                 viewModel.addToCart(it)
-                checkAndShowNotification()
+                sendNotification(it.name)
                 showDialogSuccessAddToCart()
             }
         }
@@ -177,46 +179,51 @@ class DetailActivity : AppCompatActivity() {
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = "Notifikasi saat menambah produk ke keranjang"
+                enableLights(true)
+                enableVibration(true)
+                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
             }
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }
     }
 
-    private fun checkAndShowNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                currentProduct?.let { sendNotification(it.name) }
-            } else {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        } else {
-            currentProduct?.let { sendNotification(it.name) }
-        }
-    }
-
     private fun sendNotification(productName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                return
+            }
+        }
+
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("OPEN_PAGE", "CART")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
+            this, System.currentTimeMillis().toInt(), intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_input_add)
+            .setSmallIcon(R.drawable.ic_keranjang)
             .setContentTitle("Keranjang")
             .setContentText("Produk $productName berhasil ditambahkan ke keranjang")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
+            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setFullScreenIntent(pendingIntent, true) 
             .setContentIntent(pendingIntent)
 
-        with(NotificationManagerCompat.from(this)) {
-            if (ContextCompat.checkSelfPermission(this@DetailActivity, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                notify(NOTIFICATION_ID, builder.build())
-            }
+        val notificationManager = NotificationManagerCompat.from(this)
+        try {
+            notificationManager.notify(notificationIdCounter++, builder.build())
+        } catch (e: SecurityException) {
+            e.printStackTrace()
         }
     }
 

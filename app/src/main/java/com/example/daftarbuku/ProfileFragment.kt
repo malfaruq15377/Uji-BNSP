@@ -1,5 +1,6 @@
 package com.example.daftarbuku
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,7 +21,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // For simplicity, getting data from activity intent if present
         val username = activity?.intent?.getStringExtra("USERNAME") ?: "User"
         val email = activity?.intent?.getStringExtra("EMAIL") ?: "-"
 
@@ -28,7 +28,15 @@ class ProfileFragment : Fragment() {
         binding.tvDisplayEmail.text = email
 
         binding.btnLogout.setOnClickListener {
-            val intent = Intent(requireContext(), LoginActivity::class.java)
+            val sharedPref = requireContext().getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putBoolean("IS_LOGGED_IN", false)
+                remove("USERNAME")
+                remove("EMAIL")
+                apply()
+            }
+
+            val intent = Intent(requireContext(), RegisterActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }
