@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Mencadangkan database Room -->
+    <include domain="database" path="snake_shop_database"/>
+    <include domain="database" path="snake_shop_database-shm"/>
+    <include domain="database" path="snake_shop_database-wal"/>
+    
+    <!-- Mencadangkan preferensi pengguna jika perlu -->
+    <include domain="sharedpref" path="."/>
+</full-backup-content>

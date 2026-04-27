@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scale xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="80"
+    android:fromXScale="1.0"
+    android:toXScale="0.90"
+    android:fromYScale="1.0"
+    android:toYScale="0.90"
+    android:pivotX="50%"
+    android:pivotY="50%">
+
+    <!--    animation ini membuat view mengecil sedikit ( dari 100% -> 90% ) selama 80ms, dgn titik pisat di tengah-->
+
+    <!--    android: duration = "80"-->
+    <!--    durasi animasi dlm milidetik-->
+    <!--    artinya animasi akan berlangsung selama 80ms-->
+
+    <!--    android:fromXScale="1.0"-->
+    <!--    skala horizontal ( sumbu x ) diawal animasi-->
+    <!--    1.0 berarti ukuran asli (100%)-->
+
+    <!--    android:toXScale="0.90"-->
+    <!--    skala horizontal di akhir animasi-->
+    <!--    0.90 berarti mengecil menjadi 90% dari ukuran asli-->
+</scale>
