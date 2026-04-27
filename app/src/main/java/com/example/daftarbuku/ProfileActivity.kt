@@ -16,7 +16,7 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val username = intent.getStringExtra("USERNAME") ?: "User"
-        val email = intent.getStringExtra("EMAIL") ?: "-"
+        val email = intent.getStringExtra("EMAIL") ?: "Email"
 
         binding.tvDisplayUsername.text = username
         binding.tvDisplayEmail.text = email
@@ -30,7 +30,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         binding.btnLogout.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, RegisterActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }

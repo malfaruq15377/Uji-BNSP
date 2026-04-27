@@ -2,7 +2,6 @@ package com.example.daftarbuku.data.local.room
 
 import androidx.room.*
 import com.example.daftarbuku.data.local.model.CartItem
-import com.example.daftarbuku.data.local.model.HistoryItem
 import com.example.daftarbuku.data.local.model.Product
 import com.example.daftarbuku.data.local.model.User
 import kotlinx.coroutines.flow.Flow

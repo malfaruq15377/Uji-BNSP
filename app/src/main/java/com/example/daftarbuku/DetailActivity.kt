@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -101,7 +100,10 @@ class DetailActivity : AppCompatActivity() {
         }
 
         binding.btnBeli.setOnClickListener {
-            Toast.makeText(this, "Fitur Beli Sekarang akan segera hadir!", Toast.LENGTH_SHORT).show()
+            currentProduct?.let {
+                viewModel.buyNow(it)
+                showDialogOrderBerhasil()
+            }
         }
     }
 
@@ -194,7 +196,8 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun sendNotification(productName: String) {
-        val intent = Intent(this, CartActivity::class.java).apply {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("OPEN_PAGE", "CART")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent = PendingIntent.getActivity(
@@ -223,9 +226,33 @@ class DetailActivity : AppCompatActivity() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.findViewById<Button>(R.id.btn_go_to_cart).setOnClickListener {
             dialog.dismiss()
-            startActivity(Intent(this, CartActivity::class.java))
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("OPEN_PAGE", "CART")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
         }
         dialog.findViewById<Button>(R.id.btn_close).setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun showDialogOrderBerhasil() {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_order_berhasil)
+        dialog.setCancelable(false)
+        val btnOk = dialog.findViewById<Button>(R.id.btn_ok)
+
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("OPEN_PAGE", "HISTORY")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
+        }
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
 }

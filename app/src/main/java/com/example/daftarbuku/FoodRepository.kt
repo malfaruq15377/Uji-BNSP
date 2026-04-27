@@ -83,5 +83,17 @@ class FoodRepository(private val db: AppDatabase) {
         }
     }
 
+    suspend fun buyNow(product: Product) {
+        val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        val currentDate = sdf.format(Date())
+        val historyItem = HistoryItem(
+            productName = product.name,
+            productPrice = product.price,
+            purchaseDate = currentDate,
+            productImageUrl = product.imageUrl
+        )
+        db.historyDao().insertHistory(historyItem)
+    }
+
     val allHistory: Flow<List<HistoryItem>> = db.historyDao().getAllHistory()
 }

@@ -81,4 +81,8 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     fun checkout() = viewModelScope.launch {
         repository.checkout()
     }
+
+    fun buyNow(product: Product) = viewModelScope.launch {
+        repository.buyNow(product)
+    }
 }
